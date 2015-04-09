@@ -20,9 +20,8 @@
 package org.sonar.server.source.index;
 
 import com.google.common.collect.ImmutableMap;
-import org.elasticsearch.cluster.metadata.IndexMetaData;
 import org.sonar.api.config.Settings;
-import org.sonar.process.ProcessProperties;
+import org.sonar.server.es.EsUtils;
 import org.sonar.server.es.IndexDefinition;
 import org.sonar.server.es.NewIndex;
 
@@ -64,13 +63,7 @@ public class SourceLineIndexDefinition implements IndexDefinition {
     // refresh is always handled by SourceLineIndexer
     index.getSettings().put("index.refresh_interval", "-1");
 
-    // shards
-    boolean clusterMode = settings.getBoolean(ProcessProperties.CLUSTER_ACTIVATE);
-    if (clusterMode) {
-      index.getSettings().put(IndexMetaData.SETTING_NUMBER_OF_SHARDS, 4);
-      index.getSettings().put(IndexMetaData.SETTING_NUMBER_OF_REPLICAS, 1);
-      // else keep defaults (one shard)
-    }
+    EsUtils.setShards(index, settings);
 
     // type "sourceline"
     NewIndex.NewIndexType mapping = index.createType(TYPE);
