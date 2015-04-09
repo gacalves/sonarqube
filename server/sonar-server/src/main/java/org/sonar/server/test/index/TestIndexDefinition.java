@@ -17,51 +17,45 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package org.sonar.server.activity.index;
 
-import com.google.common.collect.ImmutableMap;
+package org.sonar.server.test.index;
+
 import org.sonar.api.config.Settings;
 import org.sonar.server.es.EsUtils;
 import org.sonar.server.es.IndexDefinition;
 import org.sonar.server.es.NewIndex;
 
-/**
- * Definition of ES index "activities", including settings and fields.
- */
-public class ActivityIndexDefinition implements IndexDefinition {
-
-  public static final String INDEX = "activities";
-  public static final String TYPE = "activity";
-  public static final String FIELD_KEY = "key";
-  public static final String FIELD_TYPE = "type";
-  public static final String FIELD_ACTION = "action";
-  public static final String FIELD_CREATED_AT = "createdAt";
-  public static final String FIELD_LOGIN = "login";
-  public static final String FIELD_DETAILS = "details";
+public class TestIndexDefinition implements IndexDefinition {
+  public static final String INDEX = "tests";
+  public static final String TYPE = "test";
+  public static final String FIELD_UUID = "uuid";
+  public static final String FIELD_NAME = "name";
+  public static final String FIELD_STATUS = "status";
   public static final String FIELD_MESSAGE = "message";
+  public static final String FIELD_STACKTRACE = "stacktrace";
+  public static final String FIELD_TYPE = "type";
+  public static final String FIELD_COVERAGE_BLOCKS = "coverageBlocks";
 
   private final Settings settings;
 
-  public ActivityIndexDefinition(Settings settings) {
+  public TestIndexDefinition(Settings settings) {
     this.settings = settings;
   }
 
   @Override
   public void define(IndexDefinitionContext context) {
     NewIndex index = context.create(INDEX);
-    index.getSettings().put("analysis.analyzer.default.type", "keyword");
+
     EsUtils.refreshHandledByIndexer(index);
     EsUtils.setShards(index, settings);
 
-    // type "activity"
     NewIndex.NewIndexType mapping = index.createType(TYPE);
-    mapping.setAttribute("_id", ImmutableMap.of("path", FIELD_KEY));
-    mapping.stringFieldBuilder(FIELD_KEY).build();
-    mapping.stringFieldBuilder(FIELD_TYPE).build();
-    mapping.stringFieldBuilder(FIELD_ACTION).build();
-    mapping.stringFieldBuilder(FIELD_LOGIN).build();
-    mapping.createDynamicNestedField(FIELD_DETAILS);
-    mapping.stringFieldBuilder(FIELD_MESSAGE).build();
-    mapping.createDateTimeField(FIELD_CREATED_AT);
+    mapping.stringFieldBuilder(FIELD_UUID).build();
+    mapping.stringFieldBuilder(FIELD_NAME).build();
+    mapping.stringFieldBuilder(FIELD_STATUS).disableSearch().build();
+    mapping.stringFieldBuilder(FIELD_MESSAGE).disableSearch().build();
+    mapping.stringFieldBuilder(FIELD_STACKTRACE).disableSearch().build();
+    mapping.stringFieldBuilder(FIELD_TYPE).disableSearch().build();
+    mapping.createDynamicNestedField(FIELD_COVERAGE_BLOCKS);
   }
 }

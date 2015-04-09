@@ -92,9 +92,7 @@ public class IssueIndexDefinition implements IndexDefinition {
   public void define(IndexDefinitionContext context) {
     NewIndex index = context.create(INDEX);
 
-    // refresh is handled by IssueIndexer
-    index.getSettings().put("index.refresh_interval", "-1");
-
+    EsUtils.refreshHandledByIndexer(index);
     EsUtils.setShards(index, settings);
 
     // type "authorization"

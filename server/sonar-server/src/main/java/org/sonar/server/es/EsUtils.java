@@ -91,4 +91,8 @@ public class EsUtils {
       // else keep defaults (one shard)
     }
   }
+
+  public static void refreshHandledByIndexer(NewIndex index) {
+    index.getSettings().put("index.refresh_interval", "-1");
+  }
 }
