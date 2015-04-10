@@ -119,10 +119,12 @@ public class PersistFileSourcesStep implements ComputationStep {
     File coverageFile = reportReader.readComponentCoverage(componentRef);
     BatchReport.Scm scmReport = reportReader.readComponentScm(componentRef);
     File highlightingFile = reportReader.readComponentSyntaxHighlighting(componentRef);
+    List<BatchReport.Symbols.Symbol> symbols = reportReader.readComponentSymbols(componentRef);
 
     lineReaders.add(coverageFile != null ? new CoverageLineReader(new ReportIterator<>(coverageFile, BatchReport.Coverage.PARSER)) : null);
     lineReaders.add(scmReport != null ? new ScmLineReader(scmReport) : null);
     lineReaders.add(highlightingFile != null ? new HighlightingLineReader(new ReportIterator<>(highlightingFile, BatchReport.SyntaxHighlighting.PARSER)) : null);
+    lineReaders.add(new SymbolsLineReader(newArrayList(symbols)));
 
     Iterables.removeIf(lineReaders, Predicates.isNull());
     return lineReaders;
